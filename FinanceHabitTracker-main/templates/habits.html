@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Habits - Expense & Habit Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>
+                <i class="fas fa-check-circle me-2"></i>Habit Tracking
+            </h2>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addHabitModal">
+                <i class="fas fa-plus me-2"></i>Add Habit
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Habit Modal -->
+<div class="modal fade" id="addHabitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle me-2"></i>Add New Habit
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('add_habit') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Habit Name</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               placeholder="e.g., Morning Exercise" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                                  placeholder="Describe your habit and why it's important to you"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label">Category</label>
+                        <select class="form-select" id="category_id" name="category_id" required>
+                            <option value="">Select a category</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="target_frequency" class="form-label">Target Frequency</label>
+                        <select class="form-select" id="target_frequency" name="target_frequency" required>
+                            <option value="daily" selected>Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                </div>
+                
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-2"></i>Add Habit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Habits List -->
+<div class="row">
+    <div class="col-12">
+        {% if habits_data %}
+            {% for habit_data in habits_data %}
+            <div class="card mb-3 habit-card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-2">
+                                <h5 class="mb-0 me-3">{{ habit_data.habit.name }}</h5>
+                                <span class="badge bg-secondary">{{ habit_data.habit.category.name }}</span>
+                            </div>
+                            {% if habit_data.habit.description %}
+                            <p class="text-muted mb-2">{{ habit_data.habit.description }}</p>
+                            {% endif %}
+                            <small class="text-muted mb-2">
+                                <i class="fas fa-calendar me-1"></i>{{ habit_data.habit.target_frequency.title() }}
+                            </small>
+                        </div>
+                        
+                        <div class="col-md-2 text-center">
+                            <div class="streak-display">
+                                <i class="fas fa-fire text-warning fa-2x"></i>
+                                <div class="fw-bold">{{ habit_data.current_streak }}</div>
+                                <small class="text-muted">Day Streak</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-2 text-center">
+                            <div class="completion-rate">
+                                <div class="circular-progress" data-percentage="{{ habit_data.completion_rate }}">
+                                    <span class="percentage">{{ "%.0f"|format(habit_data.completion_rate) }}%</span>
+                                </div>
+                                <small class="text-muted d-block mt-1">30-day rate</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-2 text-center">
+                            {% if habit_data.completed_today %}
+                                <button class="btn btn-success btn-lg" disabled>
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <div class="mt-2">
+                                    <small class="text-success fw-bold">Completed!</small>
+                                </div>
+                            {% else %}
+                                
+                                <a href="{{ url_for('toggle_habit', habit_id=habit_data.habit.id) }}" 
+                                   class="btn btn-outline-success btn-lg">
+                                    <i class="fas fa-circle"></i>
+                                </a>
+                                <div class="mt-2">
+                                    <small class="text-muted">Mark Done</small>
+                                    
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ url_for('delete_habit', habit_id=habit_data.habit.id) }}" class='btn btn-danger btn-sm'> 
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </a>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-check-circle fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">No habits created yet</h4>
+                    <p class="text-muted">Start building positive habits that will improve your life over time.</p>
+                    <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#addHabitModal">
+                        <i class="fas fa-plus me-2"></i>Create Your First Habit
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Habit Tips -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-lightbulb me-2 text-warning"></i>Habit Building Tips
+                </h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="tip-item mb-3">
+                            <i class="fas fa-baby text-primary me-2"></i>
+                            <strong>Start Small:</strong> Begin with tiny habits that are easy to maintain.
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="tip-item mb-3">
+                            <i class="fas fa-calendar-check text-success me-2"></i>
+                            <strong>Be Consistent:</strong> Focus on daily consistency rather than intensity.
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="tip-item mb-3">
+                            <i class="fas fa-link text-info me-2"></i>
+                            <strong>Stack Habits:</strong> Link new habits to existing routines.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click animation to habit toggle buttons
+    const habitToggles = document.querySelectorAll('.habit-toggle');
+    habitToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Add loading state
+            const icon = this.querySelector('i');
+            const originalClass = icon.className;
+            icon.className = 'fas fa-spinner fa-spin';
+            
+            // Navigate after animation
+            setTimeout(() => {
+                window.location.href = this.href;
+            }, 300);
+        });
+    });
+    
+    // Initialize circular progress indicators
+    const circularProgress = document.querySelectorAll('.circular-progress');
+    circularProgress.forEach(progress => {
+        const percentage = progress.dataset.percentage;
+        const color = percentage >= 80 ? '#81C784' : percentage >= 60 ? '#FFB74D' : '#E57373';
+        
+        // Simple text-based progress for now - can be enhanced with CSS animations
+        progress.style.borderLeft = `3px solid ${color}`;
+        progress.style.borderRadius = '50%';
+        progress.style.padding = '10px';
+    });
+    
+    // Focus habit name input when modal opens
+    const modal = document.getElementById('addHabitModal');
+    modal.addEventListener('shown.bs.modal', function() {
+        document.getElementById('name').focus();
+    });
+});
+</script>
+{% endblock %}

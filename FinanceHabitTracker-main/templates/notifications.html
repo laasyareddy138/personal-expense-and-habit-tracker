@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>🔔 Notifications & Reminders</h2>
+    <p>Configure your notification settings.</p>
+
+    <form method="POST" action="{{ url_for('notifications') }}">
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" name="daily_summary" id="daily_summary"
+                   {% if user.daily_summary %}checked{% endif %}>
+            <label class="form-check-label" for="daily_summary">Daily Summary Email</label>
+        </div>
+
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" name="habit_reminders" id="habit_reminders"
+                   {% if user.habit_reminders %}checked{% endif %}>
+            <label class="form-check-label" for="habit_reminders">Habit Reminders</label>
+        </div>
+
+        <div class="mb-3">
+            <label for="reminder_time" class="form-label">Preferred Reminder Time</label>
+            <div class="d-flex gap-2">
+                <select name="reminder_hour" class="form-select w-auto">
+                    {% for h in range(0, 24) %}
+                        <option value="{{ h }}"
+                            {% if user.reminder_time and h == user.reminder_time.hour %}selected{% endif %}>
+                            {{ "%02d"|format(h) }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <span>:</span>
+                <select name="reminder_minute" class="form-select w-auto">
+                    {% for m in [0, 15, 30, 45] %}
+                        <option value="{{ m }}"
+                            {% if user.reminder_time and m == user.reminder_time.minute %}selected{% endif %}>
+                            {{ "%02d"|format(m) }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <button class="btn btn-primary">Save Notification Settings</button>
+    </form>
+
+    
+</div>
+{% endblock %}

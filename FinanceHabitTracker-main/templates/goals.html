@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Financial Goals - Expense & Habit Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>
+                <i class="fas fa-bullseye me-2"></i>Financial Goals
+            </h2>
+            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#addGoalModal">
+                <i class="fas fa-plus me-2"></i>Add Goal
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Goal Modal -->
+<div class="modal fade" id="addGoalModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle me-2"></i>Add New Financial Goal
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('add_goal') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Goal Name</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               placeholder="e.g., Emergency Fund, Vacation, New Car" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="target_amount" class="form-label">Target Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" step="0.01" class="form-control" 
+                                   id="target_amount" name="target_amount" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="target_date" class="form-label">Target Date</label>
+                        <input type="date" class="form-control" id="target_date" name="target_date">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                                  placeholder="Why is this goal important to you?"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-save me-2"></i>Add Goal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Goals List -->
+<div class="row">
+    <div class="col-12">
+        {% if goals %}
+            {% for goal in goals %}
+            <div class="card mb-4 goal-card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h4 class="card-title mb-1">{{ goal.name }}</h4>
+                                    {% if goal.description %}
+                                    <p class="text-muted mb-2">{{ goal.description }}</p>
+                                    {% endif %}
+                                    {% if goal.target_date %}
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>Target: {{ goal.target_date.strftime('%B %d, %Y') }}
+                                    </small>
+                                    {% endif %}
+                                </div>
+                                {% if goal.is_achieved() %}
+                                <span class="badge bg-success fs-6">
+                                    <i class="fas fa-trophy me-1"></i>Achieved!
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="progress mb-3" style="height: 20px;">
+                                <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" 
+                                     style="width: {{ goal.get_progress_percentage() }}%"
+                                     aria-valuenow="{{ goal.get_progress_percentage() }}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    {{ "%.1f"|format(goal.get_progress_percentage()) }}%
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <strong class="text-success">${{ "%.2f"|format(goal.current_amount) }}</strong>
+                                    <span class="text-muted">of ${{ "%.2f"|format(goal.target_amount) }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-muted ">
+                                        ${{ "%.2f"|format(goal.target_amount - goal.current_amount) }} remaining
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{{ url_for('delete_goal', goal_id=goal.id) }}" class='btn btn-danger btn-sm'> 
+                                    <i class="fas fa-trash"></i>
+                                    Delete
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card bg-light h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title">Add Progress</h6>
+                                    <form action="{{ url_for('update_goal', goal_id=goal.id) }}" method="POST">
+                                        <div class="mb-3">
+                                            <label class="form-label">Amount</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" step="0.01" class="form-control" 
+                                                       name="amount" placeholder="0.00" required>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="fas fa-plus me-2"></i>Add Progress
+                                        </button>
+                                    </form>
+                                    
+                                    {% if goal.target_date %}
+                                    <hr>
+                                    <div class="text-center">
+                                        
+                                        {% if goal.days_left > 0 %}
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>{{ goal.days_left }} days left
+                                        </small>
+                                        {% elif goal.days_left == 0 %}
+                                        <small class="text-warning">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Due today!
+                                        </small>
+                                        {% else %}
+                                        <small class="text-danger">
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ abs(goal.days_left) }} days overdue
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-bullseye fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">No financial goals set yet</h4>
+                    <p class="text-muted">Set clear financial goals to stay motivated and track your progress.</p>
+                    <button class="btn btn-info btn-lg" data-bs-toggle="modal" data-bs-target="#addGoalModal">
+                        <i class="fas fa-plus me-2"></i>Set Your First Goal
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Goal Setting Tips -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-lightbulb me-2 text-warning"></i>SMART Goal Setting Tips
+                </h5>
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-crosshairs text-primary fa-2x mb-2 d-block"></i>
+                            <strong>Specific</strong>
+                            <p class="small text-muted">Define exactly what you want to achieve</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-ruler text-success fa-2x mb-2 d-block"></i>
+                            <strong>Measurable</strong>
+                            <p class="small text-muted">Set a clear target amount</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-check-circle text-info fa-2x mb-2 d-block"></i>
+                            <strong>Achievable</strong>
+                            <p class="small text-muted">Make sure it's realistic</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-heart text-danger fa-2x mb-2 d-block"></i>
+                            <strong>Relevant</strong>
+                            <p class="small text-muted">Align with your values</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-clock text-warning fa-2x mb-2 d-block"></i>
+                            <strong>Time-bound</strong>
+                            <p class="small text-muted">Set a target date</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today for target date
+    const targetDateInput = document.getElementById('target_date');
+    if (targetDateInput) {
+        targetDateInput.min = new Date().toISOString().split('T')[0];
+    }
+    
+    // Focus goal name input when modal opens
+    const modal = document.getElementById('addGoalModal');
+    modal.addEventListener('shown.bs.modal', function() {
+        document.getElementById('name').focus();
+    });
+    
+    // Add confetti effect for achieved goals (simple celebration)
+    const achievedGoals = document.querySelectorAll('.badge.bg-success');
+    achievedGoals.forEach(badge => {
+        if (badge.textContent.includes('Achieved')) {
+            badge.addEventListener('click', function() {
+                // Simple celebration animation
+                this.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

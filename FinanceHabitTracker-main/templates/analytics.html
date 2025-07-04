@@ -1,0 +1,638 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Expense & Habit Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2>
+            <i class="fas fa-chart-line me-2"></i>Analytics & Insights
+        </h2>
+        <p class="text-muted">Discover patterns in your spending and habits with AI-powered insights.</p>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <!-- Expense Categories Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-pie-chart me-2"></i>This Month's Expenses by Category
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="expenseCategoryChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Daily Expenses Trend -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-line-chart me-2"></i>Daily Expenses (Last 30 Days)
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="dailyExpensesChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 2: Weekly + Yearly -->
+<div class="row mb-4">
+    <!-- Weekly Expenses Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-week me-2"></i>Weekly Expenses (Last 4 Weeks)
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="weeklyExpensesChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yearly Expenses Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i>Monthly Expenses (This Year)
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="yearlyExpensesChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Habit Completion Chart -->
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bar-chart me-2"></i>Habit Completion Rates (Last 30 Days)
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="habitCompletionChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Habit-based Expenses Chart -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bullseye me-2"></i>Spending on Habits
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="habitExpensesChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Income vs Expenses Chart -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bar-chart me-2"></i>Income vs Expenses Chart
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="incomeExpensesChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Insights -->
+<div class="row">
+    <!-- Expense Insights -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-brain me-2"></i>AI Expense Insights
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if expense_insights %}
+                    {% for insight in expense_insights %}
+                    <div class="insight-item mb-3 p-3 bg-light rounded">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        {{ insight }}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No expense data available for insights yet.</p>
+                        <a href="{{ url_for('expenses') }}" class="btn btn-primary">
+                            Add Some Expenses
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Habit Insights -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-brain me-2"></i>AI Habit Insights
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if habit_insights %}
+                    {% for insight in habit_insights %}
+                    <div class="insight-item mb-3 p-3 bg-light rounded">
+                        <i class="fas fa-star text-success me-2"></i>
+                        {{ insight }}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No habit data available for insights yet.</p>
+                        <a href="{{ url_for('habits') }}" class="btn btn-success">
+                            Start Tracking Habits
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calculator me-2"></i>Quick Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-item">
+                            <i class="fas fa-dollar-sign fa-2x text-primary mb-2"></i>
+                            <h4 class="text-primary">
+                                ${% if monthly_expenses %}{{ "%.2f"|format(monthly_expenses|sum(attribute='total')) }}{% else %}0.00{% endif %}
+                            </h4>
+                            <p class="text-muted">Monthly Expenses</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-item">
+                            <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                            <h4 class="text-success">
+                                {% if habit_completion_data %}
+                                    {% set total = 0 %}
+                                    {% set count = 0 %}
+                                    {% for habit in habit_completion_data %}
+                                        {% set total = total + habit.completion_rate %}
+                                        {% set count = count + 1 %}
+                                    {% endfor %}
+                                    {{ "%.1f"|format(total / count if count > 0 else 0) }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </h4>
+                            <p class="text-muted">Average Habit Completion</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-item">
+                            <i class="fas fa-tags fa-2x text-info mb-2"></i>
+                            <h4 class="text-info">{{ monthly_expenses|length }}</h4>
+                            <p class="text-muted">Expense Categories Used</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-item">
+                            <i class="fas fa-fire fa-2x text-warning mb-2"></i>
+                            <h4 class="text-warning">{{ habit_completion_data|length }}</h4>
+                            <p class="text-muted">Active Habits</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart.js configuration with custom colors
+    Chart.defaults.color = '#666';
+    Chart.defaults.borderColor = '#E0E0E0';
+    
+    const primaryColor = '#4DB6AC';
+    const successColor = '#81C784';
+    const warningColor = '#FFB74D';
+    const dangerColor = '#E57373';
+    const infoColor = '#64B5F6';
+    
+    // Expense Categories Pie Chart
+    fetch('/api/chart_data?type=expenses_by_category')
+        .then(response => response.json())
+        .then(data => {
+            if (data.labels && data.labels.length > 0) {
+                const ctx = document.getElementById('expenseCategoryChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.data,
+                            backgroundColor: [
+                                primaryColor,
+                                successColor,
+                                warningColor,
+                                dangerColor,
+                                infoColor,
+                                '#AB47BC',
+                                '#FF8A65',
+                                '#78909C',
+                                '#A5D6A7'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('expenseCategoryChart').parentElement.innerHTML = 
+                    '<div class="text-center py-4"><p class="text-muted">No expense data available</p></div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading expense category chart:', error);
+            document.getElementById('expenseCategoryChart').parentElement.innerHTML = 
+                '<div class="text-center py-4"><p class="text-muted">Error loading chart data</p></div>';
+        });
+    
+    // Daily Expenses Line Chart
+    fetch('/api/chart_data?type=daily_expenses')
+        .then(response => response.json())
+        .then(data => {
+            if (data.labels && data.labels.length > 0) {
+                const ctx = document.getElementById('dailyExpensesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Daily Expenses',
+                            data: data.data,
+                            borderColor: primaryColor,
+                            backgroundColor: primaryColor + '20',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: primaryColor,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toFixed(2);
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('dailyExpensesChart').parentElement.innerHTML = 
+                    '<div class="text-center py-4"><p class="text-muted">No daily expense data available</p></div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading daily expenses chart:', error);
+            document.getElementById('dailyExpensesChart').parentElement.innerHTML = 
+                '<div class="text-center py-4"><p class="text-muted">Error loading chart data</p></div>';
+        });
+
+    // Weekly Expenses Chart
+    fetch('/api/chart_data?type=weekly_expenses')
+        .then(response => response.json())
+        .then(data => {
+            if (data.labels && data.labels.length > 0) {
+                const ctx = document.getElementById('weeklyExpensesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Weekly Expenses',
+                            data: data.data,
+                            backgroundColor: primaryColor + '70',
+                            borderColor: primaryColor,
+                            borderWidth: 2,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: value => '$' + value.toFixed(2)
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('weeklyExpensesChart').parentElement.innerHTML =
+                    '<div class="text-center py-4"><p class="text-muted">No weekly data available</p></div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading weekly expenses chart:', error);
+            document.getElementById('weeklyExpensesChart').parentElement.innerHTML =
+                '<div class="text-center py-4"><p class="text-muted">Error loading chart data</p></div>';
+        });
+        
+    // Yearly Expenses Chart
+    fetch('/api/chart_data?type=yearly_expenses')
+        .then(response => response.json())
+        .then(data => {
+            if (data.labels && data.labels.length > 0) {
+                const ctx = document.getElementById('yearlyExpensesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Monthly Expenses',
+                            data: data.data,
+                            borderColor: successColor,
+                            backgroundColor: successColor + '20',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: successColor,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: value => '$' + value.toFixed(2)
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('yearlyExpensesChart').parentElement.innerHTML =
+                    '<div class="text-center py-4"><p class="text-muted">No yearly data available</p></div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading yearly expenses chart:', error);
+            document.getElementById('yearlyExpensesChart').parentElement.innerHTML =
+                '<div class="text-center py-4"><p class="text-muted">Error loading chart data</p></div>';
+        });
+        
+            
+        
+
+
+    // Habit Completion Bar Chart
+    fetch('/api/chart_data?type=habit_completion')
+        .then(response => response.json())
+        .then(data => {
+            if (data.labels && data.labels.length > 0) {
+                const ctx = document.getElementById('habitCompletionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Completion Rate (%)',
+                            data: data.data,
+                            backgroundColor: data.data.map(rate => 
+                                rate >= 80 ? successColor : 
+                                rate >= 60 ? warningColor : 
+                                dangerColor
+                            ),
+                            borderColor: data.data.map(rate => 
+                                rate >= 80 ? successColor : 
+                                rate >= 60 ? warningColor : 
+                                dangerColor
+                            ),
+                            borderWidth: 2,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('habitCompletionChart').parentElement.innerHTML = 
+                    '<div class="text-center py-4"><p class="text-muted">No habit data available</p></div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading habit completion chart:', error);
+            document.getElementById('habitCompletionChart').parentElement.innerHTML = 
+                '<div class="text-center py-4"><p class="text-muted">Error loading chart data</p></div>';
+        });
+    });
+
+    // Habit-based Expenses Chart
+    const dangerColor = '#f87171';    // Red
+    const warningColor = '#facc15';   // Yellow
+    const successColor = '#4ade80'; 
+    fetch('/api/chart_data?type=habit_expenses')
+        .then(response => response.json())
+        .then(data => {
+            // Check for backend error response
+            if (data.error) {
+                console.error('Backend error:', data.error);
+                document.getElementById('habitExpensesChart').parentElement.innerHTML =
+                    `<div class="text-center py-4 text-danger">
+                        <p class="text-danger">Error loading chart: ${data.error}</p>
+                    </div>`;
+                return;
+            }
+
+            // If valid chart data exists
+            if (data.labels && data.labels.length > 0) {
+                const ctx = document.getElementById('habitExpensesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Spending on Habits',
+                            data: data.data,
+                            backgroundColor: data.data.map(value =>
+                                value >= 500 ? dangerColor :
+                                value >= 200 ? warningColor :
+                                successColor
+                            ),
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: value => '$' + value.toFixed(2)
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            } else {
+                // No data case
+                document.getElementById('habitExpensesChart').parentElement.innerHTML =
+                    '<div class="text-center py-4"><p class="text-muted">No habit expense data available</p></div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading habit expenses chart:', error);
+            document.getElementById('habitExpensesChart').parentElement.innerHTML =
+                '<div class="text-center py-4"><p class="text-danger">Error loading chart data</p></div>';
+        });
+
+
+
+    // Income vs Expenses Bar Chart
+    const ctx = document.getElementById('incomeExpensesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Income', 'Expenses'],
+            datasets: [{
+                label: 'Amount (USD)',
+                data: [{{ monthly_income }}, {{ monthly_expense_total }}],
+                backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'],
+                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Income vs Expenses'
+                }
+            }
+        }
+    });
+
+</script>
+{% endblock %}

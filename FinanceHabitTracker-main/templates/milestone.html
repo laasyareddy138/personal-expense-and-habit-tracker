@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Milestone Achieved! - Expense & Habit Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid celebration-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card celebration-card text-center">
+                <div class="card-body py-5">
+                    <!-- Celebration Header -->
+                    <div class="celebration-header mb-4">
+                        <i class="fas fa-trophy celebration-icon text-warning"></i>
+                        <h1 class="celebration-title text-primary mb-3">
+                            🎉 Congratulations! 🎉
+                        </h1>
+                        <h2 class="milestone-title text-success">
+                            You've Achieved a Milestone!
+                        </h2>
+                    </div>
+                    
+                    <!-- Milestone Details -->
+                    <div class="milestone-details mb-5">
+                        <div class="milestone-badge">
+                            {% if milestone.milestone_type == 'habit_streak' %}
+                                <i class="fas fa-fire fa-3x text-warning mb-3"></i>
+                                <h3 class="text-primary">{{ milestone.milestone_value }} Day Streak!</h3>
+                            {% elif milestone.milestone_type == 'financial_goal' %}
+                                <i class="fas fa-bullseye fa-3x text-success mb-3"></i>
+                                <h3 class="text-primary">Financial Goal Achieved!</h3>
+                            {% else %}
+                                <i class="fas fa-star fa-3x text-info mb-3"></i>
+                                <h3 class="text-primary">Amazing Achievement!</h3>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="milestone-description mt-4">
+                            <p class="lead text-dark">{{ milestone.description }}</p>
+                            <p class="text-muted">
+                                <i class="fas fa-calendar me-2"></i>
+                                Achieved on {{ milestone.achieved_at.strftime('%B %d, %Y at %I:%M %p') }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Motivational Message -->
+                    <div class="motivational-section mb-5">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="motivation-card">
+                                    <i class="fas fa-chart-line fa-2x text-success mb-3"></i>
+                                    <h5>Keep Growing</h5>
+                                    <p class="text-muted">Every milestone is a step toward your bigger goals!</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="motivation-card">
+                                    <i class="fas fa-heart fa-2x text-danger mb-3"></i>
+                                    <h5>Stay Consistent</h5>
+                                    <p class="text-muted">Consistency is the key to lasting change.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="motivation-card">
+                                    <i class="fas fa-rocket fa-2x text-info mb-3"></i>
+                                    <h5>Aim Higher</h5>
+                                    <p class="text-muted">You're capable of even greater achievements!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-home me-2"></i>Back to Dashboard
+                        </a>
+                        
+                        {% if milestone.milestone_type == 'habit_streak' %}
+                            <a href="{{ url_for('habits') }}" class="btn btn-success btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>Continue Habits
+                            </a>
+                        {% elif milestone.milestone_type == 'financial_goal' %}
+                            <a href="{{ url_for('goals') }}" class="btn btn-info btn-lg">
+                                <i class="fas fa-bullseye me-2"></i>View Goals
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('analytics') }}" class="btn btn-warning btn-lg">
+                                <i class="fas fa-chart-bar me-2"></i>View Analytics
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Share Achievement -->
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="fas fa-share-alt me-2"></i>Share Your Achievement
+                    </h5>
+                    <p class="text-muted">Let others know about your success!</p>
+                    
+                    <div class="share-buttons">
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="shareAchievement('twitter')">
+                            <i class="fab fa-twitter me-1"></i>Twitter
+                        </button>
+                        <button class="btn btn-outline-success btn-sm me-2" onclick="shareAchievement('whatsapp')">
+                            <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="copyToClipboard()">
+                            <i class="fas fa-copy me-1"></i>Copy Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confetti Animation -->
+<div class="confetti-container"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Create confetti effect
+    createConfetti();
+    
+    // Animate milestone card entrance
+    const card = document.querySelector('.celebration-card');
+    card.style.transform = 'scale(0.8)';
+    card.style.opacity = '0';
+    
+    setTimeout(() => {
+        card.style.transition = 'all 0.5s ease-out';
+        card.style.transform = 'scale(1)';
+        card.style.opacity = '1';
+    }, 100);
+    
+    // Animate trophy icon
+    setTimeout(() => {
+        const trophy = document.querySelector('.celebration-icon');
+        trophy.style.animation = 'bounce 1s ease-in-out';
+    }, 600);
+});
+
+function createConfetti() {
+    const confettiContainer = document.querySelector('.confetti-container');
+    const colors = ['#4DB6AC', '#81C784', '#FFB74D', '#E57373', '#64B5F6'];
+    
+    for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        confetti.style.cssText = `
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            left: ${Math.random() * 100}%;
+            animation: confetti-fall ${Math.random() * 3 + 2}s linear infinite;
+            animation-delay: ${Math.random() * 2}s;
+            z-index: 1000;
+        `;
+        confettiContainer.appendChild(confetti);
+    }
+    
+    // Remove confetti after animation
+    setTimeout(() => {
+        confettiContainer.innerHTML = '';
+    }, 5000);
+}
+
+function shareAchievement(platform) {
+    const text = `🎉 I just achieved a milestone: {{ milestone.description }} Check out my progress on my expense and habit tracker!`;
+    const url = window.location.href;
+    
+    switch(platform) {
+        case 'twitter':
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`);
+            break;
+        case 'whatsapp':
+            window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`);
+            break;
+    }
+}
+
+function copyToClipboard() {
+    const text = `🎉 I just achieved a milestone: {{ milestone.description }} ${window.location.href}`;
+    
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Achievement link copied to clipboard!');
+        });
+    } else {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('Achievement link copied to clipboard!');
+    }
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4DB6AC;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes confetti-fall {
+        0% {
+            transform: translateY(-100vh) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-30px);
+        }
+        60% {
+            transform: translateY(-15px);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .celebration-icon {
+        font-size: 4rem;
+        margin-bottom: 2rem;
+    }
+    
+    .motivation-card {
+        padding: 1.5rem;
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+    
+    .motivation-card:hover {
+        transform: translateY(-5px);
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

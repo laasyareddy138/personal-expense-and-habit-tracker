@@ -1,0 +1,259 @@
+ {% extends "base.html" %}
+
+{% block title %}Dashboard - Expense & Habit Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Welcome Header -->
+    <div class="col-12 mb-4">
+            <div class="card bg-gradient-primary text-muted">
+                <div class="card-body">
+                    <h1 class="card-title">
+                        <i class="fas fa-sun me-2"></i>Welcome to Your Dashboard
+                    </h1>
+                    <p class="card-text">Track your expenses, build great habits, and achieve your financial goals.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Milestone Celebrations -->
+{% if uncelebrated_milestones %}
+<div class="row mb-4">
+    <div class="col-12">
+        {% for milestone in uncelebrated_milestones %}
+        <div class="alert alert-success alert-dismissible fade show celebration-alert" role="alert">
+            <h4 class="alert-heading">
+                <i class="fas fa-trophy me-2"></i>Congratulations! 🎉
+            </h4>
+            <p class="mb-2">{{ milestone.description }}</p>
+            <a href="{{ url_for('celebrate_milestone', milestone_id=milestone.id) }}" class="btn btn-success btn-sm">
+                Celebrate! <i class="fas fa-party-horn ms-1"></i>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <!-- Quick Stats -->
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <i class="fas fa-dollar-sign fa-2x text-primary mb-2"></i>
+                <h5 class="card-title">This Month</h5>
+                <h3 class="text-primary">${{ "%.2f"|format(monthly_expenses) }}</h3>
+                <small class="text-muted">Total Expenses</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                <h5 class="card-title">Active Habits</h5>
+                <h3 class="text-success">{{ habits_status|length }}</h3>
+                <small class="text-muted">Being Tracked</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <i class="fas fa-bullseye fa-2x text-info mb-2"></i>
+                <h5 class="card-title">Financial Goals</h5>
+                <h3 class="text-info">{{ active_goals|length }}</h3>
+                <small class="text-muted">In Progress</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <i class="fas fa-fire fa-2x text-warning mb-2"></i>
+                <h5 class="card-title">Best Streak</h5>
+                <h3 class="text-warning">
+                    {% set max_streak = habits_status|map(attribute='current_streak')|max or 0 %}
+                    {{ max_streak }}
+                </h3>
+                <small class="text-muted">Days</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Today's Habits -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-check-circle me-2"></i>Today's Habits
+                </h5>
+                <a href="{{ url_for('habits') }}" class="btn btn-outline-primary btn-sm">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if habits_status %}
+                    {% for habit_status in habits_status[:5] %}
+                    <div class="d-flex justify-content-between align-items-center mb-3 habit-item">
+                        <div>
+                            <h6 class="mb-1">{{ habit_status.habit.name }}</h6>
+                            <small class="text-muted">
+                                <i class="fas fa-fire me-1"></i>{{ habit_status.current_streak }} day streak
+                            </small>
+                        </div>
+                        <div>
+                            {% if habit_status.completed_today %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Done
+                                </span>
+                            {% else %}
+                                <a href="{{ url_for('toggle_habit', habit_id=habit_status.habit.id) }}" 
+                                   class="btn btn-outline-success btn-sm">
+                                    Mark Done
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-plus-circle fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No habits yet. Start building great habits today!</p>
+                        <a href="{{ url_for('habits') }}" class="btn btn-primary">
+                            Add Your First Habit
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Expenses -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-receipt me-2"></i>Recent Expenses
+                </h5>
+                <a href="{{ url_for('expenses') }}" class="btn btn-outline-primary btn-sm">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_expenses %}
+                    {% for expense in recent_expenses %}
+                    <div class="d-flex justify-content-between align-items-center mb-3 expense-item">
+                        <div>
+                            <h6 class="mb-1">{{ expense.description or expense.category.name }}</h6>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>{{ expense.date.strftime('%b %d, %Y') }}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-tag me-1"></i>{{ expense.category.name }}
+                            </small>
+                        </div>
+                        <div>
+                            <span class="badge bg-danger">${{ "%.2f"|format(expense.amount) }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-wallet fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No expenses recorded yet.</p>
+                        <a href="{{ url_for('expenses') }}" class="btn btn-primary">
+                            Add Your First Expense
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Financial Goals -->
+{% if active_goals %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-bullseye me-2"></i>Financial Goals Progress
+                </h5>
+                <a href="{{ url_for('goals') }}" class="btn btn-outline-primary btn-sm">
+                    Manage Goals
+                </a>
+            </div>
+            <div class="card-body">
+                {% for goal in active_goals[:3] %}
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">{{ goal.name }}</h6>
+                        <small class="text-muted">
+                            ${{ "%.2f"|format(goal.current_amount) }} / ${{ "%.2f"|format(goal.target_amount) }}
+                        </small>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" 
+                             style="width: {{ goal.get_progress_percentage() }}%"
+                             aria-valuenow="{{ goal.get_progress_percentage() }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ "%.1f"|format(goal.get_progress_percentage()) }}% complete</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('expenses') }}" class="btn btn-outline-primary btn-lg w-100">
+                            <i class="fas fa-plus-circle d-block fa-2x mb-2"></i>
+                            Add Expense
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('habits') }}" class="btn btn-outline-success btn-lg w-100">
+                            <i class="fas fa-check-circle d-block fa-2x mb-2"></i>
+                            Track Habits
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('goals') }}" class="btn btn-outline-info btn-lg w-100">
+                            <i class="fas fa-bullseye d-block fa-2x mb-2"></i>
+                            Set Goals
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('analytics') }}" class="btn btn-outline-warning btn-lg w-100">
+                            <i class="fas fa-chart-line d-block fa-2x mb-2"></i>
+                            View Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

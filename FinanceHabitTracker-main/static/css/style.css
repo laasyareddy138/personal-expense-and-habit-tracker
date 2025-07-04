@@ -1,0 +1,486 @@
+/* Custom CSS for Expense & Habit Tracker */
+
+:root {
+    /* Primary colors following the style guide */
+    --primary: 210 11% 98%; /* Calm teal #4DB6AC */
+    --primary-rgb: 77, 182, 172;
+    --secondary: 0 0% 93%; /* Light grey #EEEEEE */
+    --secondary-rgb: 238, 238, 238;
+    --accent: 92 39% 64%; /* Vibrant green #81C784 */
+    --accent-rgb: 129, 199, 132;
+    
+    /* Additional colors */
+    --success: hsl(92, 39%, 64%); /* #81C784 */
+    --warning: hsl(39, 85%, 68%); /* #FFB74D */
+    --danger: hsl(14, 72%, 67%); /* #E57373 */
+    --info: hsl(207, 86%, 69%); /* #64B5F6 */
+    --light: hsl(0, 0%, 93%); /* #EEEEEE */
+    --dark: hsl(210, 11%, 21%); /* #2E3440 */
+}
+
+/* Override Bootstrap primary color */
+.bg-primary {
+    background-color: #4DB6AC !important;
+}
+
+.btn-primary {
+    background-color: #4DB6AC;
+    border-color: #4DB6AC;
+}
+
+.btn-primary:hover {
+    background-color: #26A69A;
+    border-color: #26A69A;
+}
+
+.text-primary {
+    color: #4DB6AC !important;
+}
+
+.border-primary {
+    border-color: #4DB6AC !important;
+}
+
+/* Custom button styles */
+.btn-success {
+    background-color: var(--success);
+    border-color: var(--success);
+}
+
+.btn-success:hover {
+    background-color: #66BB6A;
+    border-color: #66BB6A;
+}
+
+/* Body and general styling */
+body {
+    background-image: url('/static/p1.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #F8F9FA;
+}
+
+/* Navigation improvements */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #81C784 !important;
+}
+
+/* Card styling */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: white;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Stat cards */
+.stat-card {
+    text-align: center;
+    padding: 1rem;
+}
+
+.stat-card .card-body {
+    padding: 2rem 1rem;
+}
+
+.stat-card h3 {
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+/* Habit-specific styling */
+.habit-card {
+    border-left: 4px solid #4DB6AC;
+}
+
+.habit-item {
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.habit-item:hover {
+    background-color: #F1F8E9;
+}
+
+.streak-display {
+    text-align: center;
+}
+
+.streak-display .fw-bold {
+    font-size: 1.5rem;
+    color: #FF9800;
+}
+
+.circular-progress {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: conic-gradient(#81C784 0deg, #E0E0E0 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+}
+
+.circular-progress .percentage {
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+/* Expense-specific styling */
+.expense-item {
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.expense-item:hover {
+    background-color: #FFF3E0;
+}
+
+.expense-row:hover {
+    background-color: #F5F5F5;
+}
+
+/* Goal-specific styling */
+.goal-card {
+    border-left: 4px solid #2196F3;
+}
+
+.progress {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+/* Modal improvements */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid #E0E0E0;
+    background-color: #F8F9FA;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-footer {
+    border-top: 1px solid #E0E0E0;
+    background-color: #F8F9FA;
+    border-radius: 0 0 12px 12px;
+}
+
+/* Form improvements */
+.form-control:focus, .form-select:focus {
+    border-color: #4DB6AC;
+    box-shadow: 0 0 0 0.2rem rgba(77, 182, 172, 0.25);
+}
+
+.input-group-text {
+    background-color: #F8F9FA;
+    border-color: #E0E0E0;
+}
+
+/* Badge styling */
+.badge {
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+}
+
+/* Button improvements */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Quick action buttons */
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-info:hover,
+.btn-outline-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Analytics page styling */
+.insight-item {
+    border-left: 4px solid #4DB6AC;
+    transition: all 0.3s ease;
+}
+
+.insight-item:hover {
+    background-color: #E0F2F1 !important;
+    transform: translateX(4px);
+}
+
+/* Chart containers */
+canvas {
+    max-height: 400px;
+}
+
+/* Celebration page styling */
+.celebration-container {
+    background: linear-gradient(135deg, #4DB6AC 0%, #81C784 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.celebration-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.celebration-icon {
+    font-size: 5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.celebration-title {
+    font-size: 3rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.milestone-title {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.milestone-badge {
+    background: linear-gradient(135deg, #F8F9FA 0%, #E3F2FD 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem auto;
+    display: inline-block;
+}
+
+.motivation-card {
+    background: #F8F9FA;
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.motivation-card:hover {
+    transform: translateY(-5px);
+    background: #E8F5E8;
+}
+
+/* Loading states */
+.btn.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .celebration-title {
+        font-size: 2rem;
+    }
+    
+    .milestone-title {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card .card-body {
+        padding: 1.5rem 0.5rem;
+    }
+    
+    .celebration-icon {
+        font-size: 3rem;
+    }
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Apply animations */
+.card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.habit-toggle:hover {
+    animation: pulse 0.6s ease-in-out;
+}
+
+/* Accessibility improvements */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: 2px solid #4DB6AC;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .modal,
+    .btn,
+    footer {
+        display: none !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
+
+/* Dark mode support (for future implementation) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bs-body-bg: #1a1a1a;
+        --bs-body-color: #ffffff;
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4DB6AC;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #26A69A;
+}
+
+/* Tooltip improvements */
+.tooltip-inner {
+    background-color: #4DB6AC;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.875rem;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #4DB6AC;
+}
+
+/* Alert improvements */
+.alert {
+    border-radius: 10px;
+    border: none;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: rgba(129, 199, 132, 0.1);
+    color: #2E7D32;
+    border-left: 4px solid #81C784;
+}
+
+.alert-danger {
+    background-color: rgba(229, 115, 115, 0.1);
+    color: #C62828;
+    border-left: 4px solid #E57373;
+}
+
+/* Table improvements */
+.table-hover tbody tr:hover {
+    background-color: rgba(77, 182, 172, 0.05);
+}
+
+/* Footer styling */
+footer {
+    margin-top: auto;
+    background-color: var(--light) !important;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Success animations */
+.success-checkmark {
+    animation: checkmark 0.6s ease-in-out;
+}
+
+@keyframes checkmark {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
