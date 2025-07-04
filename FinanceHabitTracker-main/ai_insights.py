@@ -7,7 +7,7 @@ from app import db
 from sqlalchemy import func
 
 # Initialize OpenAI client
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = ""
 client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 def get_expense_insights(user_id):
